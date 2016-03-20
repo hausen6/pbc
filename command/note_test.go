@@ -10,6 +10,12 @@ import (
 func TestCmdNote(t *testing.T) {
 	// Write your code here
 	fmt.Println("starting TestCmdNote")
-	var c *cli.Context
-	CmdNote(c)
+	app := cli.NewApp()
+	app.Commands = []cli.Command{
+		{
+			Name:   "note",
+			Action: CmdNote,
+		},
+	}
+	app.Run([]string{"note", "note", "test", "this is test."})
 }

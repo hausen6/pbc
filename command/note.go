@@ -10,11 +10,11 @@ import (
 
 // logging format
 var (
-	log         = logging.GetLogger("pbc.note")
-	handler     = logging.NewStdoutHandler()
-	format      = "[%(levelname)s]:%(filename)s:%(lineno)d %(message)s"
-	date_format = "%Y/%M%/D-%H:%m:%S"
-	formatter   = logging.NewStandardFormatter(format, date_format)
+	log        = logging.GetLogger("pbc.note")
+	handler    = logging.NewStdoutHandler()
+	format     = "[%(levelname)s]:%(filename)s:%(lineno)d %(message)s"
+	dateFormat = "%Y/%M%/D-%H:%m:%S"
+	formatter  = logging.NewStandardFormatter(format, dateFormat)
 )
 
 func getToken() string {
@@ -32,6 +32,13 @@ func CmdNote(c *cli.Context) {
 	log.AddHandler(handler)
 	log.SetLevel(logging.LevelDebug)
 
+	// check the arguments
+	args := c.Args()
+	if len(args) < 2 {
+		log.Fatal("number of arguments must be 2.")
+		os.Exit(1)
+	}
+
 	// get token
 	token := getToken()
 	pb := pushbullet.New(token)
@@ -43,12 +50,12 @@ func CmdNote(c *cli.Context) {
 	}
 	// push note
 	for _, device := range devices {
-		log.Infof("pushing note for %s.", device.Model)
-		// err = pb.PushNote(device.Iden, "TEST", "this is test") if err != nil {
-		// 	log.Error(err)
-		// } else {
-		// 	log.Infof("pushing note for %s.\n", device.Model)
-		// }
+		err = pb.PushNote(device.Iden, args[0], args[1])
+		if err != nil {
+			log.Error(err)
+		} else {
+			log.Infof("pushing note for %s.", device.Model)
+		}
 	}
 
 }
